@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="ru" class="h-100">
+    <head>
+        <script type="text/javascript" src="{{ url_for('static', filename='keyboard.js') }}"></script>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <meta name="description" content="">
+        <title>Di webControl</title>
+        <body>
+            <h1>Di video stream</h1>
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-8  offset-lg-2">
+                        <h3 class="mt-5">/video_feed</h3>
+                        <img src="{{ url_for('video_feed') }}" width="60%">
+                    </div>
+                </div>
+        </body>
+    </head>
+</html>
