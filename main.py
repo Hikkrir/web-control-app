@@ -3,7 +3,7 @@ import json
 import cv2 as cv
 from flask import Flask, Response, render_template
 
-app = Flask(__name__, template_folder="D:\web_app\\templates\\", static_folder="D:\web_app\static\\")
+app = Flask(__name__, template_folder=".\\templates\\", static_folder=".\static\\")
 
 @app.route("/video_generator")
 def video_generator():
