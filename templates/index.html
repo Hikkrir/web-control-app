@@ -1,7 +1,6 @@
 <!doctype html>
 <html lang="ru" class="h-100">
     <head>
-        <script type="text/javascript" src="{{ url_for('static', filename='keyboard.js') }}"></script>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
         <meta name="description" content="">
@@ -15,6 +14,7 @@
                         <img src="{{ url_for('video_feed') }}" width="60%">
                     </div>
                 </div>
+                <script src="{{ url_for('static', filename='keyboard.js') }}"></script>
         </body>
     </head>
 </html>
