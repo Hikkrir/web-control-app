@@ -13,7 +13,7 @@ class Control():
         IN1 двигателя -- 23
         IN2 двигателя -- 24
     """
-    def __init__(self, pwm_pin = 12, IN1 = 25, IN2 = 21, 
+    def __init__(self, pwm_pin = 32, IN1 = 23, IN2 = 24, 
                 frequency = 20000, channels = 16):
         self.pwm_pin = pwm_pin
         self.IN1 = IN1
