@@ -4,12 +4,6 @@ let speed = 0
 window.addEventListener('keydown', (event) => {
     if (event.repeat !== true){
         switch(event.key){
-            case "s":
-                speed = -99
-                break;
-            case "w":
-                speed = 99
-                break;
             case "a":
                 angle = 75
                 break;
@@ -17,7 +11,20 @@ window.addEventListener('keydown', (event) => {
                 angle = 160
                 break;
         }
-        fetch(`/keyboard_control/${angle}/${speed}`)
+        fetch(`/keyboard_control_angle/${angle}`)
+    }
+})
+window.addEventListener('keydown', (event) => {
+    if (event.repeat !== true){
+        switch(event.key){
+            case "s":
+                speed = -99
+                break;
+            case "w":
+                speed = 99
+                break;
+        }
+        fetch(`/keyboard_control_speed/${speed}`)
     }
 })
 
@@ -30,6 +37,13 @@ window.addEventListener('keyup', (event) => {
             case "w":
                 speed = 0
                 break;
+            }
+            fetch(`/keyboard_control_speed/${speed}`)
+    }
+})
+window.addEventListener('keyup', (event) => {
+    if (event.repeat !== true){
+        switch(event.key){
             case "a":
                 angle = 110
                 break;
@@ -37,6 +51,6 @@ window.addEventListener('keyup', (event) => {
                 angle = 110
                 break;
             }
-            fetch(`/keyboard_control/${angle}/${speed}`)
+            fetch(`/keyboard_control_angle/${angle}`)
     }
 })
