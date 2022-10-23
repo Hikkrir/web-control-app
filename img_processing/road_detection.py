@@ -72,38 +72,41 @@ class RoadDetection():
             return base_point, img_hist
         return base_point
 
-    def get_frame_with_curve_result(self, frame, return_curve= False):
-        frame_result = frame.copy()
-        warped_img = RoadDetection().warp_img(RoadDetection().thresholding_frame(frame), RoadDetection().trackbars_values(), self.FRAME_WINDOW_WIDHT, self.FRAME_WINDOW_HEIGHT)
-        middle_point, img_histogram = RoadDetection().get_histogram(warped_img, display= True, min_percentage= 0.5, region= 4)
-        curve_avarage_point, img_histogram = RoadDetection().get_histogram(warped_img, display= True, min_percentage= 0.9)
-        curve_raw = curve_avarage_point - middle_point
+    def get_frame_with_curve_result(self, frame= None, return_curve= False):
+        ret, frame = self.cap.read()
+        if ret:
+            frame_result = frame.copy()
+            warped_img = RoadDetection().warp_img(RoadDetection().thresholding_frame(frame), RoadDetection().trackbars_values(), self.FRAME_WINDOW_WIDHT, self.FRAME_WINDOW_HEIGHT)
+            middle_point, img_histogram = RoadDetection().get_histogram(warped_img, display= True, min_percentage= 0.5, region= 4)
+            curve_avarage_point, img_histogram = RoadDetection().get_histogram(warped_img, display= True, min_percentage= 0.9)
+            curve_raw = curve_avarage_point - middle_point
 
-        self.CURVE_LIST.append(curve_raw)
-        if len(self.CURVE_LIST) > self.AVG_VALUE:
-            self.CURVE_LIST.pop(0)
-        curve = int(sum(self.CURVE_LIST)/len(self.CURVE_LIST))
+            self.CURVE_LIST.append(curve_raw)
+            if len(self.CURVE_LIST) > self.AVG_VALUE:
+                self.CURVE_LIST.pop(0)
+            curve = int(sum(self.CURVE_LIST)/len(self.CURVE_LIST))
 
-        if return_curve:
-            return curve
+            if return_curve:
+                return curve
 
-        warped_inverted_img = RoadDetection().warp_img(warped_img, RoadDetection().trackbars_values(), self.FRAME_WINDOW_WIDHT, self.FRAME_WINDOW_HEIGHT, inverse= True)
-        warped_inverted_img = cv.cvtColor(warped_inverted_img, cv.COLOR_GRAY2BGR)
-        warped_inverted_img[0:self.FRAME_WINDOW_HEIGHT//3,0:self.FRAME_WINDOW_WIDHT] = 0, 0, 0
-        img_lane_color = np.zeros_like(frame)
-        img_lane_color[:] = 0, 255, 0
-        img_lane_color = cv.bitwise_and(warped_inverted_img, img_lane_color)
-        frame_result = cv.addWeighted(frame_result, 1, img_lane_color, 1,0)
+            warped_inverted_img = RoadDetection().warp_img(warped_img, RoadDetection().trackbars_values(), self.FRAME_WINDOW_WIDHT, self.FRAME_WINDOW_HEIGHT, inverse= True)
+            warped_inverted_img = cv.cvtColor(warped_inverted_img, cv.COLOR_GRAY2BGR)
+            warped_inverted_img[0:self.FRAME_WINDOW_HEIGHT//3,0:self.FRAME_WINDOW_WIDHT] = 0, 0, 0
+            img_lane_color = np.zeros_like(frame)
+            img_lane_color[:] = 0, 255, 0
+            img_lane_color = cv.bitwise_and(warped_inverted_img, img_lane_color)
+            frame_result = cv.addWeighted(frame_result, 1, img_lane_color, 1,0)
 
-        cv.putText(frame_result,str(curve),(self.FRAME_WINDOW_WIDHT//2-80,85),cv.FONT_HERSHEY_COMPLEX,2,(255,0,255),3)
-        cv.line(frame_result, (self.FRAME_WINDOW_WIDHT//2, self.Y_MIDDLE), (self.FRAME_WINDOW_WIDHT//2 + (curve * 3), self.Y_MIDDLE), (255, 0, 255), 5)
-        cv.line(frame_result, ((self.FRAME_WINDOW_WIDHT // 2 + (curve * 3)), self.Y_MIDDLE - 25), (self.FRAME_WINDOW_WIDHT // 2 + (curve * 3), self.Y_MIDDLE + 25), (0, 255, 0), 5)
+            cv.putText(frame_result,str(curve),(self.FRAME_WINDOW_WIDHT//2-80,85),cv.FONT_HERSHEY_COMPLEX,2,(255,0,255),3)
+            cv.line(frame_result, (self.FRAME_WINDOW_WIDHT//2, self.Y_MIDDLE), (self.FRAME_WINDOW_WIDHT//2 + (curve * 3), self.Y_MIDDLE), (255, 0, 255), 5)
+            cv.line(frame_result, ((self.FRAME_WINDOW_WIDHT // 2 + (curve * 3)), self.Y_MIDDLE - 25), (self.FRAME_WINDOW_WIDHT // 2 + (curve * 3), self.Y_MIDDLE + 25), (0, 255, 0), 5)
 
-        for i in range(-30, 30):
-            width = self.FRAME_WINDOW_WIDHT // 20
-            cv.line(frame_result, (width * i + int(curve//50), self.Y_MIDDLE - 10),
-                        (width * i + int(curve//50), self.Y_MIDDLE + 10), (0, 0, 255), 2)
-        return frame_result
+            for i in range(-30, 30):
+                width = self.FRAME_WINDOW_WIDHT // 20
+                cv.line(frame_result, (width * i + int(curve//50), self.Y_MIDDLE - 10),
+                            (width * i + int(curve//50), self.Y_MIDDLE + 10), (0, 0, 255), 2)
+            _, buffer = cv.imencode('.jpg', frame_result)
+            yield (b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + buffer.tobytes() + b'\r\n')
 
     def curve_val_generator(self, frame):
         curve_value = RoadDetection().get_frame_with_curve_result(frame, return_curve= True)
