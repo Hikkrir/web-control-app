@@ -109,7 +109,7 @@ class RoadDetection():
         curve_value = RoadDetection().get_frame_with_curve_result(frame, return_curve= True)
         print(curve_value)
 
-    def get_complete_img(self):
+    def get_complete_img_stream(self):
         while True:
             ret, frame = self.cap.read()
             if ret:
@@ -126,4 +126,4 @@ class RoadDetection():
         cv.destroyAllWindows()
 
 if __name__ == "__main__":
-    RoadDetection().get_complete_img()
+    RoadDetection().get_complete_img_stream()
