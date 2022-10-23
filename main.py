@@ -4,7 +4,7 @@ from servo_motor_handler import Control
 from img_processing.video_stream import video_generator
 
 control_handler = Control()
-app = Flask(__name__, template_folder=".\\templates\\", static_folder=".\static\\")
+app = Flask(__name__, template_folder="templates", static_folder="static")
 
 @app.route("/")
 def main_page():
