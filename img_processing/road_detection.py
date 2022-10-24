@@ -117,7 +117,6 @@ class RoadDetection():
                         
                         self.controller.move_forward(max_speed)
 
-                        if curve == 0: pass
                         if 0 < curve < max_angle_val:
                             angle = default_angle_value + curve
                             self.controller.change_angle_servo(angle)
