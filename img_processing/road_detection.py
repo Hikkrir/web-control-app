@@ -5,7 +5,8 @@ import cv2 as cv
 
 class RoadDetection():
     def __init__(self) -> None:
-        self.cap = cv.VideoCapture("D:\Captures\example.mp4")
+        # self.cap = cv.VideoCapture("D:\Captures\example.mp4")
+        self.cap = cv.VideoCapture(0)
 
         self.AVG_VALUE = 10
         self.Y_MIDDLE = 450
