@@ -1,12 +1,13 @@
 import numpy as np
 import cv2 as cv
 
+from servo_motor_handler import Control
+
 # #929ca5
 
 class RoadDetection():
     def __init__(self) -> None:
-        # self.cap = cv.VideoCapture("D:\Captures\example.mp4")
-        # self.cap = cv.VideoCapture(0)
+        self.controller = Control()
 
         self.AVG_VALUE = 10
         self.Y_MIDDLE = 450
@@ -72,7 +73,7 @@ class RoadDetection():
             return base_point, img_hist
         return base_point
 
-    def get_frame_with_curve_result(self, frame= None, return_curve= False):
+    def get_frame_with_curve_result(self, frame= None, automode= False):
         cap = cv.VideoCapture(0)
         while True:
             ret, frame = cap.read()
@@ -88,9 +89,6 @@ class RoadDetection():
                 if len(self.CURVE_LIST) > self.AVG_VALUE:
                     self.CURVE_LIST.pop(0)
                 curve = int(sum(self.CURVE_LIST)/len(self.CURVE_LIST))
-
-                if return_curve:
-                    return curve
 
                 warped_inverted_img = RoadDetection().warp_img(warped_img, RoadDetection().trackbars_values(), wT, hT, inverse=True)
                 warped_inverted_img = cv.cvtColor(warped_inverted_img, cv.COLOR_GRAY2BGR)
@@ -109,6 +107,23 @@ class RoadDetection():
                     cv.line(frame_result, (width * i + int(curve//50), self.Y_MIDDLE - 10),
                                 (width * i + int(curve//50), self.Y_MIDDLE + 10), (0, 0, 255), 2)
                 _, buffer = cv.imencode('.jpg', frame_result)
+                with open('check.txt', 'r') as file:
+                    automode = file.readline()
+                    if automode == "true":
+                        max_speed = 90
+                        max_angle_val = 50
+                        min_angle_val = 25
+                        default_angle_value = 110
+                        
+                        self.controller.move_forward(max_speed)
+
+                        if 0 < curve < max_angle_val:
+                            angle = default_angle_value + curve
+                            self.controller.change_angle_servo(angle)
+                        if 0 > curve < min_angle_val:
+                            angle = default_angle_value + curve
+                            self.controller.change_angle_servo(angle)
+
                 yield (b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + buffer.tobytes() + b'\r\n')
 
     def curve_val_generator(self, frame):
