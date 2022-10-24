@@ -77,8 +77,8 @@ class RoadDetection():
         cap = cv.VideoCapture(0)
         while True:
             ret, frame = cap.read()
-            hT, wT, c = frame.shape
             if ret:
+                hT, wT, c = frame.shape
                 frame_result = frame
                 warped_img = RoadDetection().warp_img(RoadDetection().thresholding_frame(frame), RoadDetection().trackbars_values(), wT, hT)
                 middle_point, img_histogram = RoadDetection().get_histogram(warped_img, display= True, min_percentage= 0.5, region= 4)
