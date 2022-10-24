@@ -77,9 +77,10 @@ class RoadDetection():
         cap = cv.VideoCapture(0)
         while True:
             ret, frame = cap.read()
+            hT, wT, c = frame.shape
             if ret:
                 frame_result = frame
-                warped_img = RoadDetection().warp_img(RoadDetection().thresholding_frame(frame), RoadDetection().trackbars_values(), self.FRAME_WINDOW_WIDHT, self.FRAME_WINDOW_HEIGHT)
+                warped_img = RoadDetection().warp_img(RoadDetection().thresholding_frame(frame), RoadDetection().trackbars_values(), wT, hT)
                 middle_point, img_histogram = RoadDetection().get_histogram(warped_img, display= True, min_percentage= 0.5, region= 4)
                 curve_avarage_point, img_histogram = RoadDetection().get_histogram(warped_img, display= True, min_percentage= 0.9)
                 curve_raw = curve_avarage_point - middle_point
@@ -92,7 +93,6 @@ class RoadDetection():
                 if return_curve:
                     return curve
 
-                hT, wT, c = frame.shape
                 warped_inverted_img = RoadDetection().warp_img(warped_img, RoadDetection().trackbars_values(), wT, hT, inverse=True)
                 warped_inverted_img = cv.cvtColor(warped_inverted_img, cv.COLOR_GRAY2BGR)
                 warped_inverted_img[0:hT // 3, 0:wT] = 0, 0, 0
