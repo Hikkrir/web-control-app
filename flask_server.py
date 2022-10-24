@@ -1,7 +1,8 @@
 from flask import Flask, Response, render_template, jsonify
 
 from servo_motor_handler import Control
-from img_processing.video_stream import video_generator
+# from img_processing.video_stream import video_generator
+from img_processing.road_detection import RoadDetection
 
 control_handler = Control()
 app = Flask(__name__, template_folder="templates", static_folder="static")
@@ -12,7 +13,7 @@ def main_page():
 
 @app.route('/video_feed')
 def video_feed():
-    return Response(video_generator(), mimetype='multipart/x-mixed-replace; boundary=frame')
+    return Response(RoadDetection().get_frame_with_curve_result(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 @app.route("/keyboard_control_speed/<speed>", methods=['POST', 'GET'])
 def keyboard_control_speed(speed):
