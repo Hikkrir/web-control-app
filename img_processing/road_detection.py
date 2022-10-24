@@ -65,9 +65,9 @@ class RoadDetection():
             histValues = np.sum(frame[frame.shape[0]//region:,:], axis=0)
         
         if display:
-            img_hist = np.zeros((frame.shape[0], frame.shape[1], 3), np.uint8)
+            img_hist = np.zeros((int(frame.shape[0]), int(frame.shape[1]), 3), np.uint8)
             for i, intensity in enumerate(histValues):
-                cv.line(img_hist, (i, frame.shape[0]), (i, frame.shape[0]-intensity//255//region), (255, 0, 255), 1)
+                cv.line(img_hist, (i, int(frame.shape[0])), (i, int(frame.shape[0]-intensity//255//region)), (255, 0, 255), 1)
                 cv.circle(img_hist, (base_point, frame.shape[0]), 20, (0, 255, 255), cv.FILLED)
             return base_point, img_hist
         return base_point
