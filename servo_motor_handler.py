@@ -32,7 +32,6 @@ class Control():
         print(angle)
     
     def move_forward(self, dutycycle):
-        print(dutycycle)
         self.pwm.ChangeDutyCycle(dutycycle)
         GPIO.output(self.IN1, GPIO.HIGH)
         GPIO.output(self.IN2, GPIO.LOW)
