@@ -77,9 +77,9 @@ class RoadDetection():
     def video_stream(self):
         print("stream up")
         while True:
-            input_frame = get_frame()
-            if input_frame[0]:
-                frame = input_frame.copy()
+            input_frame_list = get_frame()
+            if input_frame_list[0]:
+                frame = input_frame_list[1].copy()
                 hT, wT, c = frame.shape
                 frame_result = frame
                 warped_img = RoadDetection().warp_img(RoadDetection().thresholding_frame(frame), RoadDetection().trackbars_values(), wT, hT)
@@ -114,9 +114,9 @@ class RoadDetection():
     def automode(self):
         print("automode up\nSPEED: 80")
         while True:
-            input_frame = get_frame()
-            if input_frame[0]:
-                frame_for_stream = input_frame.copy()
+            input_frame_list = get_frame()
+            if input_frame_list[0]:
+                frame_for_stream = input_frame_list[1].copy()
                 hT, wT, c = frame_for_stream.shape
                 warped_img = RoadDetection().warp_img(RoadDetection().thresholding_frame(frame_for_stream), RoadDetection().trackbars_values(), wT, hT)
                 middle_point, _ = RoadDetection().get_histogram(warped_img, display= True, min_percentage= 0.5, region= 4)
