@@ -3,10 +3,9 @@ from flask import Flask, Response, render_template, jsonify
 
 from servo_motor_handler import Control
 from img_processing.video_stream import video_generator
-from img_processing.road_detection import RoadDetection
+# from img_processing.road_detection import RoadDetection
 
 control_handler = Control()
-
 
 app = Flask(__name__, template_folder="templates", static_folder="static")
 mode = False
@@ -37,7 +36,4 @@ def keyboard_control_angle(angle):
     control_handler.change_angle_servo(int(angle))
     return jsonify(True)
 
-with open('check.txt', 'w') as file:
-    file.write("false")
-Thread(target= RoadDetection().get_frame_with_curve_result, args= (mode, )).start()
 app.run(debug=False, host="0.0.0.0", port=8888)
