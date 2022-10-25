@@ -27,7 +27,7 @@ def video_feed():
 
 @app.route("/keyboard_control_speed/<speed>", methods=['POST', 'GET'])
 def keyboard_control_speed(speed):
-    control_handler.move_backward(speed) if int(speed) < 0 else control_handler.move_forward(speed)
+    control_handler.move_backward(abs(int(speed)))
     return jsonify(True)
 
 @app.route("/keyboard_control_angle/<angle>", methods=['POST', 'GET'])
