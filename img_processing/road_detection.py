@@ -78,7 +78,7 @@ class RoadDetection():
         print("stream up")
         while True:
             input_frame = get_frame()
-            if np.all(input_frame):
+            if input_frame[0]:
                 frame = input_frame.copy()
                 hT, wT, c = frame.shape
                 frame_result = frame
@@ -115,7 +115,7 @@ class RoadDetection():
         print("automode up\nSPEED: 80")
         while True:
             input_frame = get_frame()
-            if np.all(input_frame):
+            if input_frame[0]:
                 frame_for_stream = input_frame.copy()
                 hT, wT, c = frame_for_stream.shape
                 warped_img = RoadDetection().warp_img(RoadDetection().thresholding_frame(frame_for_stream), RoadDetection().trackbars_values(), wT, hT)

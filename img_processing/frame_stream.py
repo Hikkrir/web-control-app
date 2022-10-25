@@ -3,7 +3,4 @@ cap = cv.VideoCapture(0)
 
 def get_frame():
     ret, frame = cap.read()
-    if ret:
-        return frame
-    else:
-        return False
+    return [frame, ret]
