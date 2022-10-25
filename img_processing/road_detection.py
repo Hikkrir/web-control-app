@@ -20,7 +20,7 @@ class RoadDetection():
         self.TRACKBAR_HEIGHT_BOTTOM = 600
 
 
-        self.FRAME_WINDOW_WIDHT = 480
+        self.FRAME_WINDOW_WIDHT = 1280
         self.TRACKBAR_WINDOW_WIGTH = 360
         self.TRACKBAR_WINDOW_height = 360
 
