@@ -39,5 +39,5 @@ def keyboard_control_angle(angle):
 
 with open('check.txt', 'w') as file:
     file.write("false")
-Thread(target= RoadDetection().get_frame_with_curve_result, args= (mode, ))
+Thread(target= RoadDetection().get_frame_with_curve_result, args= (mode, )).start()
 app.run(debug=False, host="0.0.0.0", port=8888)
