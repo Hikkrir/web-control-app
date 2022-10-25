@@ -20,8 +20,6 @@ class RoadDetection():
         self.TRACKBAR_WIDTH_BOTTOM = 0
         self.TRACKBAR_HEIGHT_BOTTOM = 600
 
-
-        self.FRAME_WINDOW_WIDHT = 1280
         self.TRACKBAR_WINDOW_WIGTH = 360
         self.TRACKBAR_WINDOW_height = 360
 
@@ -33,9 +31,9 @@ class RoadDetection():
         mask = cv.inRange(hsv,self.GRAY_LOWER, self.GRAY_UPPER)
         return mask
 
-    def trackbars_values(self):
-        points = np.float32([(self.TRACKBAR_WIDTH_TOP, self.TRACKBAR_HEIGHT_TOP), (self.FRAME_WINDOW_WIDHT - self.TRACKBAR_WIDTH_TOP, self.TRACKBAR_HEIGHT_TOP),
-                        (self.TRACKBAR_WIDTH_BOTTOM , self.TRACKBAR_HEIGHT_BOTTOM ), (self.FRAME_WINDOW_WIDHT - self.TRACKBAR_WIDTH_BOTTOM, self.TRACKBAR_HEIGHT_BOTTOM)])
+    def trackbars_values(self, frame_window_widht):
+        points = np.float32([(self.TRACKBAR_WIDTH_TOP, self.TRACKBAR_HEIGHT_TOP), (frame_window_widht - self.TRACKBAR_WIDTH_TOP, self.TRACKBAR_HEIGHT_TOP),
+                        (self.TRACKBAR_WIDTH_BOTTOM , self.TRACKBAR_HEIGHT_BOTTOM ), (frame_window_widht - self.TRACKBAR_WIDTH_BOTTOM, self.TRACKBAR_HEIGHT_BOTTOM)])
         return points
 
     def warp_img(self, frame, points, widht, height, inverse= False):
@@ -82,7 +80,7 @@ class RoadDetection():
                 frame = input_frame_list[1].copy()
                 hT, wT, c = frame.shape
                 frame_result = frame
-                warped_img = self.warp_img(self.thresholding_frame(frame), self.trackbars_values(), wT, hT)
+                warped_img = self.warp_img(self.thresholding_frame(frame), self.trackbars_values(frame_window_widht=wT), wT, hT)
                 middle_point, img_histogram = self.get_histogram(warped_img, display= True, min_percentage= 0.5, region= 4)
                 curve_avarage_point, img_histogram = self.get_histogram(warped_img, display= True, min_percentage= 0.9)
                 curve_raw = curve_avarage_point - middle_point
@@ -92,7 +90,7 @@ class RoadDetection():
                     self.CURVE_LIST.pop(0)
                 curve = int(sum(self.CURVE_LIST)/len(self.CURVE_LIST))
 
-                warped_inverted_img = self.warp_img(warped_img, self.trackbars_values(), wT, hT, inverse=True)
+                warped_inverted_img = self.warp_img(warped_img, self.trackbars_values(frame_window_widht=wT), wT, hT, inverse=True)
                 warped_inverted_img = cv.cvtColor(warped_inverted_img, cv.COLOR_GRAY2BGR)
                 warped_inverted_img[0:hT // 3, 0:wT] = 0, 0, 0
                 img_lane_color = np.zeros_like(frame)
@@ -112,13 +110,13 @@ class RoadDetection():
                 yield (b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + buffer.tobytes() + b'\r\n')
 
     def automode(self):
-        print("automode up\nSPEED: 80")
+        print("automode available\nSPEED: 80")
         while True:
             input_frame_list = get_frame()
             if input_frame_list[0]:
                 frame_for_stream = input_frame_list[1].copy()
                 hT, wT, c = frame_for_stream.shape
-                warped_img = self.warp_img(self.thresholding_frame(frame_for_stream), self.trackbars_values(), wT, hT)
+                warped_img = self.warp_img(self.thresholding_frame(frame_for_stream), self.trackbars_values(frame_window_widht=wT), wT, hT)
                 middle_point, _ = self.get_histogram(warped_img, display= True, min_percentage= 0.5, region= 4)
                 curve_avarage_point, _ = self.get_histogram(warped_img, display= True, min_percentage= 0.9)
                 curve_raw = curve_avarage_point - middle_point
