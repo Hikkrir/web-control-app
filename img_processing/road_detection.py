@@ -73,7 +73,7 @@ class RoadDetection():
             return base_point, img_hist
         return base_point
 
-    def get_frame_with_curve_result(self, frame= None, automode= False):
+    def get_frame_with_curve_result(self, automode= False):
         cap = cv.VideoCapture(0)
         while True:
             ret, frame = cap.read()
@@ -123,8 +123,6 @@ class RoadDetection():
                         if 0 > curve < min_angle_val:
                             angle = default_angle_value + curve
                             self.controller.change_angle_servo(angle)
-
-                yield (b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + buffer.tobytes() + b'\r\n')
 
     def curve_val_generator(self, frame):
         curve_value = RoadDetection().get_frame_with_curve_result(frame, return_curve= True)

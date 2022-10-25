@@ -1,11 +1,13 @@
+from threading import Thread
 from flask import Flask, Response, render_template, jsonify
 
 from servo_motor_handler import Control
-# from img_processing.video_stream import video_generator
+from img_processing.video_stream import video_generator
 from img_processing.road_detection import RoadDetection
 
 control_handler = Control()
-road = RoadDetection()
+
+
 app = Flask(__name__, template_folder="templates", static_folder="static")
 mode = False
 
@@ -23,7 +25,7 @@ def check_mode(automode):
 
 @app.route('/video_feed')
 def video_feed():
-    return Response(road.get_frame_with_curve_result(automode= mode), mimetype='multipart/x-mixed-replace; boundary=frame')
+    return Response(video_generator, mimetype='multipart/x-mixed-replace; boundary=frame')
 
 @app.route("/keyboard_control_speed/<speed>", methods=['POST', 'GET'])
 def keyboard_control_speed(speed):
@@ -37,4 +39,5 @@ def keyboard_control_angle(angle):
 
 with open('check.txt', 'w') as file:
     file.write("false")
+Thread(target= RoadDetection().get_frame_with_curve_result, args= (mode, ))
 app.run(debug=False, host="0.0.0.0", port=8888)
