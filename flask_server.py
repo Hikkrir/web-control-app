@@ -32,7 +32,7 @@ def keyboard_control_speed(speed):
 
 @app.route("/keyboard_control_angle/<angle>", methods=['POST', 'GET'])
 def keyboard_control_angle(angle):
-    control_handler.change_angle_servo(angle)
+    control_handler.change_angle_servo(int(angle))
     return jsonify(True)
 
 with open('check.txt', 'w') as file:
