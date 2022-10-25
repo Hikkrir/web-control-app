@@ -2,11 +2,12 @@ import numpy as np
 import cv2 as cv
 
 from servo_motor_handler import Control
+from img_processing.frame_stream import get_frame
 
 # #929ca5
 
 class RoadDetection():
-    def __init__(self) -> None:
+    def __init__(self):
         self.controller = Control()
 
         self.AVG_VALUE = 10
@@ -73,76 +74,74 @@ class RoadDetection():
             return base_point, img_hist
         return base_point
 
-    def get_frame_with_curve_result(self, automode= False):
-        cap = cv.VideoCapture(0)
+    def video_stream(self):
+        print("stream up")
         while True:
-            ret, frame = cap.read()
-            if ret:
-                hT, wT, c = frame.shape
-                frame_result = frame
-                warped_img = RoadDetection().warp_img(RoadDetection().thresholding_frame(frame), RoadDetection().trackbars_values(), wT, hT)
-                middle_point, img_histogram = RoadDetection().get_histogram(warped_img, display= True, min_percentage= 0.5, region= 4)
-                curve_avarage_point, img_histogram = RoadDetection().get_histogram(warped_img, display= True, min_percentage= 0.9)
-                curve_raw = curve_avarage_point - middle_point
+            input_frame = get_frame()
+            frame = input_frame.copy()
+            hT, wT, c = frame.shape
+            frame_result = frame
+            warped_img = RoadDetection().warp_img(RoadDetection().thresholding_frame(frame), RoadDetection().trackbars_values(), wT, hT)
+            middle_point, img_histogram = RoadDetection().get_histogram(warped_img, display= True, min_percentage= 0.5, region= 4)
+            curve_avarage_point, img_histogram = RoadDetection().get_histogram(warped_img, display= True, min_percentage= 0.9)
+            curve_raw = curve_avarage_point - middle_point
 
-                self.CURVE_LIST.append(curve_raw)
-                if len(self.CURVE_LIST) > self.AVG_VALUE:
-                    self.CURVE_LIST.pop(0)
-                curve = int(sum(self.CURVE_LIST)/len(self.CURVE_LIST))
+            self.CURVE_LIST.append(curve_raw)
+            if len(self.CURVE_LIST) > self.AVG_VALUE:
+                self.CURVE_LIST.pop(0)
+            curve = int(sum(self.CURVE_LIST)/len(self.CURVE_LIST))
 
-                warped_inverted_img = RoadDetection().warp_img(warped_img, RoadDetection().trackbars_values(), wT, hT, inverse=True)
-                warped_inverted_img = cv.cvtColor(warped_inverted_img, cv.COLOR_GRAY2BGR)
-                warped_inverted_img[0:hT // 3, 0:wT] = 0, 0, 0
-                img_lane_color = np.zeros_like(frame)
-                img_lane_color[:] = 0, 255, 0
-                img_lane_color = cv.bitwise_and(warped_inverted_img, img_lane_color)
-                frame_result = cv.addWeighted(frame_result, 1, img_lane_color, 1,0)
+            warped_inverted_img = RoadDetection().warp_img(warped_img, RoadDetection().trackbars_values(), wT, hT, inverse=True)
+            warped_inverted_img = cv.cvtColor(warped_inverted_img, cv.COLOR_GRAY2BGR)
+            warped_inverted_img[0:hT // 3, 0:wT] = 0, 0, 0
+            img_lane_color = np.zeros_like(frame)
+            img_lane_color[:] = 0, 255, 0
+            img_lane_color = cv.bitwise_and(warped_inverted_img, img_lane_color)
+            frame_result = cv.addWeighted(frame_result, 1, img_lane_color, 1,0)
 
-                cv.putText(frame_result,str(curve),(wT//2-80,85),cv.FONT_HERSHEY_COMPLEX,2,(255,0,255),3)
-                cv.line(frame_result, (wT//2, self.Y_MIDDLE), (wT//2 + (curve * 3), self.Y_MIDDLE), (255, 0, 255), 5)
-                cv.line(frame_result, ((wT // 2 + (curve * 3)), self.Y_MIDDLE - 25), (wT // 2 + (curve * 3), self.Y_MIDDLE + 25), (0, 255, 0), 5)
+            cv.putText(frame_result,str(curve),(wT//2-80,85),cv.FONT_HERSHEY_COMPLEX,2,(255,0,255),3)
+            cv.line(frame_result, (wT//2, self.Y_MIDDLE), (wT//2 + (curve * 3), self.Y_MIDDLE), (255, 0, 255), 5)
+            cv.line(frame_result, ((wT // 2 + (curve * 3)), self.Y_MIDDLE - 25), (wT // 2 + (curve * 3), self.Y_MIDDLE + 25), (0, 255, 0), 5)
 
-                for i in range(-30, 30):
-                    width = wT // 20
-                    cv.line(frame_result, (width * i + int(curve//50), self.Y_MIDDLE - 10),
-                                (width * i + int(curve//50), self.Y_MIDDLE + 10), (0, 0, 255), 2)
-                _, buffer = cv.imencode('.jpg', frame_result)
-                with open('check.txt', 'r') as file:
-                    automode = file.readline()
-                    if automode == "true":
-                        max_speed = 90
-                        max_angle_val = 50
-                        min_angle_val = 25
-                        default_angle_value = 110
-                        
-                        self.controller.move_forward(max_speed)
+            for i in range(-30, 30):
+                width = wT // 20
+                cv.line(frame_result, (width * i + int(curve//50), self.Y_MIDDLE - 10),
+                            (width * i + int(curve//50), self.Y_MIDDLE + 10), (0, 0, 255), 2)
+            _, buffer = cv.imencode('.jpg', frame_result)
+            yield (b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + buffer.tobytes() + b'\r\n')
 
-                        if 0 < curve < max_angle_val:
+    def automode(self):
+        print("automode up\nSPEED: 80")
+        while True:
+            input_frame = get_frame()
+            frame_for_stream = input_frame.copy()
+            hT, wT, c = frame_for_stream.shape
+            warped_img = RoadDetection().warp_img(RoadDetection().thresholding_frame(frame_for_stream), RoadDetection().trackbars_values(), wT, hT)
+            middle_point, _ = RoadDetection().get_histogram(warped_img, display= True, min_percentage= 0.5, region= 4)
+            curve_avarage_point, _ = RoadDetection().get_histogram(warped_img, display= True, min_percentage= 0.9)
+            curve_raw = curve_avarage_point - middle_point
+
+            self.CURVE_LIST.append(curve_raw)
+            if len(self.CURVE_LIST) > self.AVG_VALUE:
+                self.CURVE_LIST.pop(0)
+            curve = int(sum(self.CURVE_LIST)/len(self.CURVE_LIST))
+            with open('check.txt', 'r') as file:
+                automode = file.readline()
+                if automode == "true":
+                    sensitivity = 5
+                    speed = 80
+                    max_angle_val = 50
+                    min_angle_val = 25
+                    default_angle_value = 110
+                    
+                    self.controller.move_forward(speed)
+                    if abs(curve) > sensitivity:
+                        if min_angle_val < curve < max_angle_val:
                             angle = default_angle_value + curve
                             self.controller.change_angle_servo(angle)
-                        if 0 > curve < min_angle_val:
+                        if 0 > curve :
                             angle = default_angle_value + curve
                             self.controller.change_angle_servo(angle)
-
-    def curve_val_generator(self, frame):
-        curve_value = RoadDetection().get_frame_with_curve_result(frame, return_curve= True)
-        print(curve_value)
-
-    def get_complete_img_stream(self):
-        while True:
-            ret, frame = self.cap.read()
-            if ret:
-                frame_with_hist_and_curve = RoadDetection().get_frame_with_curve_result(frame)
-                cv.imshow('Resutlt', frame_with_hist_and_curve)
-            else:
-                self.cap.set(cv.CAP_PROP_POS_FRAMES, 0)
-                continue
-
-            if cv.waitKey(1) == ord('q'):
-                break
-
-        self.cap.release()
-        cv.destroyAllWindows()
 
 if __name__ == "__main__":
-    RoadDetection().get_complete_img_stream()
+    RoadDetection().video_processing(automode= True)
