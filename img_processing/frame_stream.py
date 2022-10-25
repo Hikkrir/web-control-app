@@ -1,5 +1,5 @@
 import cv2 as cv
-cap = cv.VideoCapture(0, cv.CAP_DSHOW)
+cap = cv.VideoCapture(0)
 
 def get_frame():
     ret, frame = cap.read()
