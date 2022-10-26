@@ -11,7 +11,7 @@ class RoadDetection():
         self.controller = Control()
 
         self.AVG_VALUE = 10
-        self.Y_MIDDLE = 450
+        self.Y_MIDDLE = 640
         self.CURVE_LIST = []
 
         # [0, 350, 0, 600]
@@ -51,26 +51,23 @@ class RoadDetection():
             cv.circle(frame, (int(points[i][0]), int(points[i][1])), 15, (0, 0, 255), cv.FILLED)
         return frame
 
-    def get_histogram(self, frame, display=False, min_percentage = 0.1, region= 1):
-        histValues = np.sum(frame, axis=0)
+    def get_histogram(self, frame, min_percentage = 0.1, region= 1):
+        if region == 1:
+            histValues = np.sum(frame, axis=0)
+        else:
+            histValues = np.sum(frame[frame.shape[0]//region:,:], axis=0)
+        
         max_value = np.max(histValues)
         min_value = min_percentage*max_value
         
         index_list = np.where(histValues >= min_value)
         base_point = int(np.average(index_list))
         
-        if region == 1:
-            histValues = np.sum(frame, axis=0)
-        else:
-            histValues = np.sum(frame[frame.shape[0]//region:,:], axis=0)
-        
-        if display:
-            img_hist = np.zeros((int(frame.shape[0]), int(frame.shape[1]), 3), np.uint8)
-            for i, intensity in enumerate(histValues):
-                cv.line(img_hist, (i, int(frame.shape[0])), (i, int(frame.shape[0]-intensity//255//region)), (255, 0, 255), 1)
-                cv.circle(img_hist, (base_point, frame.shape[0]), 20, (0, 255, 255), cv.FILLED)
-            return base_point, img_hist
-        return base_point
+        img_hist = np.zeros((int(frame.shape[0]), int(frame.shape[1]), 3), np.uint8)
+        for i, intensity in enumerate(histValues):
+            cv.line(img_hist, (i, int(frame.shape[0])), (i, int(frame.shape[0]-intensity//255//region)), (255, 0, 255), 1)
+            cv.circle(img_hist, (base_point, frame.shape[0]), 20, (0, 255, 255), cv.FILLED)
+        return base_point, img_hist
 
     def video_stream(self):
         print("stream up")
@@ -79,10 +76,11 @@ class RoadDetection():
             if input_frame_list[0]:
                 frame = input_frame_list[1].copy()
                 hT, wT, c = frame.shape
-                frame_result = frame
+                frame_result = input_frame_list[1].copy()
+
                 warped_img = self.warp_img(self.thresholding_frame(frame), self.trackbars_values(frame_window_widht=wT), wT, hT)
-                middle_point, img_histogram = self.get_histogram(warped_img, display= True, min_percentage= 0.5, region= 4)
-                curve_avarage_point, img_histogram = self.get_histogram(warped_img, display= True, min_percentage= 0.9)
+                middle_point, _ = self.get_histogram(warped_img, min_percentage= 0.5, region= 4)
+                curve_avarage_point, _ = self.get_histogram(warped_img, min_percentage= 0.9)
                 curve_raw = curve_avarage_point - middle_point
 
                 self.CURVE_LIST.append(curve_raw)
@@ -116,9 +114,10 @@ class RoadDetection():
             if input_frame_list[0]:
                 frame_for_stream = input_frame_list[1].copy()
                 hT, wT, c = frame_for_stream.shape
+                
                 warped_img = self.warp_img(self.thresholding_frame(frame_for_stream), self.trackbars_values(frame_window_widht=wT), wT, hT)
-                middle_point, _ = self.get_histogram(warped_img, display= True, min_percentage= 0.5, region= 4)
-                curve_avarage_point, _ = self.get_histogram(warped_img, display= True, min_percentage= 0.9)
+                middle_point, _ = self.get_histogram(warped_img, min_percentage= 0.7, region= 4)
+                curve_avarage_point, _ = self.get_histogram(warped_img, min_percentage= 0.9)
                 curve_raw = curve_avarage_point - middle_point
 
                 self.CURVE_LIST.append(curve_raw)

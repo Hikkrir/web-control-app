@@ -1,8 +1,8 @@
-import Jetson.GPIO as GPIO
-from adafruit_servokit import ServoKit
+# import Jetson.GPIO as GPIO
+# from adafruit_servokit import ServoKit
 
-GPIO.cleanup()
-GPIO.setmode(GPIO.BCM)
+# GPIO.cleanup()
+# GPIO.setmode(GPIO.BCM)
 
 class Control():
     """
@@ -20,24 +20,25 @@ class Control():
         self.IN2 = IN2
         self.channels = channels
         self.frequency = frequency
-        GPIO.setup(self.pwm_pin, GPIO.OUT)
-        GPIO.setup(self.IN1, GPIO.OUT)
-        GPIO.setup(self.IN2, GPIO.OUT)
-        self.pwm = GPIO.PWM(self.pwm_pin, self.frequency)
-        self.pwm.start(0)
-        self.kit = ServoKit(channels = self.channels)
+        # GPIO.setup(self.pwm_pin, GPIO.OUT)
+        # GPIO.setup(self.IN1, GPIO.OUT)
+        # GPIO.setup(self.IN2, GPIO.OUT)
+        # self.pwm = GPIO.PWM(self.pwm_pin, self.frequency)
+        # self.pwm.start(0)
+        # self.kit = ServoKit(channels = self.channels)
 
     def change_angle_servo(self, angle, servo_pin = 0):
-        self.kit.servo[servo_pin].angle = angle
+        # self.kit.servo[servo_pin].angle = angle
         print(angle)
     
     def move_forward(self, dutycycle):
-        self.pwm.ChangeDutyCycle(dutycycle)
-        GPIO.output(self.IN1, GPIO.HIGH)
-        GPIO.output(self.IN2, GPIO.LOW)
+        # self.pwm.ChangeDutyCycle(dutycycle)
+        # GPIO.output(self.IN1, GPIO.HIGH)
+        # GPIO.output(self.IN2, GPIO.LOW)
+        pass
     
     def move_backward(self, dutycycle):
         print(dutycycle)
-        self.pwm.ChangeDutyCycle(dutycycle)
-        GPIO.output(self.IN1, GPIO.LOW)
-        GPIO.output(self.IN2, GPIO.HIGH)
+        # self.pwm.ChangeDutyCycle(dutycycle)
+        # GPIO.output(self.IN1, GPIO.LOW)
+        # GPIO.output(self.IN2, GPIO.HIGH)
