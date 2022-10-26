@@ -13,12 +13,12 @@ class RoadDetection():
         self.AVG_VALUE = 10
         self.Y_MIDDLE = 640
         self.CURVE_LIST = []
-
+        # [110,240,0,400]
         # [0, 350, 0, 600]
-        self.TRACKBAR_WIDTH_TOP = 0
-        self.TRACKBAR_HEIGHT_TOP = 350
+        self.TRACKBAR_WIDTH_TOP = 110
+        self.TRACKBAR_HEIGHT_TOP = 240
         self.TRACKBAR_WIDTH_BOTTOM = 0
-        self.TRACKBAR_HEIGHT_BOTTOM = 600
+        self.TRACKBAR_HEIGHT_BOTTOM = 400
 
         self.TRACKBAR_WINDOW_WIGTH = 360
         self.TRACKBAR_WINDOW_height = 360
