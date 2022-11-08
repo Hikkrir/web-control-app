@@ -6,7 +6,6 @@ from img_processing.road_detection import RoadDetection
 
 control_handler = Control()
 video_stream = RoadDetection()
-control_handler.stop()
 Thread(target= video_stream.automode, name= "automode").start()
 app = Flask(__name__, template_folder="templates", static_folder="static")
 mode = False
@@ -30,15 +29,15 @@ def video_feed():
 @app.route("/keyboard_control_speed/<speed>", methods=['POST', 'GET'])
 def keyboard_control_speed(speed):
     speed = int(speed)
-    if speed == 0:
-        control_handler.stop()
-        return jsonify(True)
-    elif speed < 0:
-        control_handler.move_backward(abs(speed))
-        return jsonify(True)
-    else:
-        control_handler.move_forward(abs(speed))
-        return jsonify(True)
+    # if speed == 0:
+    #     control_handler.stop()
+    #     return jsonify(True)
+    # elif speed < 0:
+    #     control_handler.move_backward(abs(speed))
+    #     return jsonify(True)
+    # else:
+    #     control_handler.move_forward(abs(speed))
+    return jsonify(True)
 
 @app.route("/keyboard_control_angle/<angle>", methods=['POST', 'GET'])
 def keyboard_control_angle(angle):
