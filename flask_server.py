@@ -28,8 +28,15 @@ def video_feed():
 
 @app.route("/keyboard_control_speed/<speed>", methods=['POST', 'GET'])
 def keyboard_control_speed(speed):
-    control_handler.move_backward(abs(int(speed)))
-    return jsonify(True)
+    speed = int(speed)
+    if speed == 0:
+        control_handler.stop()
+    elif speed < 0:
+        control_handler.move_backward(abs(speed))
+        return jsonify(True)
+    else:
+        control_handler.move_forward(abs(speed))
+        return jsonify(True)
 
 @app.route("/keyboard_control_angle/<angle>", methods=['POST', 'GET'])
 def keyboard_control_angle(angle):

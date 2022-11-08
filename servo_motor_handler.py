@@ -29,15 +29,17 @@ class Control():
 
     def change_angle_servo(self, angle, servo_pin = 0):
         self.kit.servo[servo_pin].angle = angle
-        print(angle)
     
     def move_forward(self, dutycycle):
         self.pwm.ChangeDutyCycle(dutycycle)
         GPIO.output(self.IN1, GPIO.HIGH)
         GPIO.output(self.IN2, GPIO.LOW)
+
+    def stop(self):
+        GPIO.output(self.IN1, GPIO.LOW)
+        GPIO.output(self.IN2, GPIO.LOW)
     
     def move_backward(self, dutycycle):
-        print(dutycycle)
         self.pwm.ChangeDutyCycle(dutycycle)
         GPIO.output(self.IN1, GPIO.LOW)
         GPIO.output(self.IN2, GPIO.HIGH)
